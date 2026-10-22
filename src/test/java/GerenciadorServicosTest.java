@@ -2,31 +2,39 @@ import br.com.drygest.Categoria;
 import br.com.drygest.GerenciadorServicos;
 import br.com.drygest.Servico;
 import br.com.drygest.Status;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import java.util.List;
+import java.util.NoSuchElementException;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class GerenciadorServicosTest {
+
+    private GerenciadorServicos gs;
+
+    @BeforeEach
+    void preparar() {
+        gs = new GerenciadorServicos();
+    }
+
     @Test
     void deveRetornarZero() {
-        GerenciadorServicos gs1 = new GerenciadorServicos();
         assertEquals(
                 0.00,
-                gs1.somaValoresPorCategoria(Categoria.SANCA));
+                gs.somaValoresPorCategoria(Categoria.SANCA));
     }
 
     @Test
     void deveRejeitarCategoriaNull() {
-        GerenciadorServicos gs1 = new GerenciadorServicos();
         assertThrows(
                 IllegalArgumentException.class,
-                () -> gs1.somaValoresPorCategoria(null));
+                () -> gs.somaValoresPorCategoria(null));
     }
 
     @Test
     void deveSomarPorCategoria() {
-        GerenciadorServicos gs = new GerenciadorServicos();
         Servico servico1 = new Servico(
                 "Forro de Sala",
                 1500,
@@ -50,15 +58,16 @@ public class GerenciadorServicosTest {
                 2300.0,
                 gs.somaValoresPorCategoria(Categoria.FORRO));
     }
+
     @Test
     void relatorioDinamico() {
-        GerenciadorServicos gs = new GerenciadorServicos();
         Servico servico1 = new Servico(
                 "Forro de Sala",
                 2000,
                 Categoria.FORRO,
                 4,
-                5);
+                5
+        );
         gs.cadastrarServico(servico1);
         assertEquals(
                 2000,
@@ -79,9 +88,9 @@ public class GerenciadorServicosTest {
         );
 
     }
+
     @Test
     void rejeitarOMesmoObjeto() {
-        GerenciadorServicos gs = new GerenciadorServicos();
         Servico servico1 = new Servico(
                 "Forro de Sala",
                 2000,
@@ -98,21 +107,23 @@ public class GerenciadorServicosTest {
                 gs.quantidadeServicos()
         );
     }
+
     @Test
     void verificarObjetosParecidos() {
-        GerenciadorServicos gs = new GerenciadorServicos();
         Servico servico1 = new Servico(
                 "Forro de Sala",
                 2000,
                 Categoria.FORRO,
                 4,
-                5);
+                5
+        );
         Servico servico2 = new Servico(
                 "Forro de Sala",
                 2000,
                 Categoria.FORRO,
                 4,
-                5);
+                5
+        );
         gs.cadastrarServico(servico1);
         gs.cadastrarServico(servico2);
         assertEquals(
@@ -120,29 +131,32 @@ public class GerenciadorServicosTest {
                 gs.quantidadeServicos()
         );
     }
+
     @Test
     void verificarIds() {
-        GerenciadorServicos gs = new GerenciadorServicos();
         Servico servico1 = new Servico(
                 "Forro de Sala",
                 1500,
                 Categoria.FORRO,
                 4,
-                5);
+                5
+        );
         gs.cadastrarServico(servico1);
         Servico servico2 = new Servico(
                 "Forro da Garagem",
                 1800,
                 Categoria.FORRO,
                 6,
-                6);
+                6
+        );
         gs.cadastrarServico(servico2);
         Servico servico3 = new Servico(
                 "Parede do Quarto",
                 1400,
                 Categoria.PAREDE,
                 4,
-                2.80);
+                2.80
+        );
         gs.cadastrarServico(servico3);
         assertEquals(
                 1,
@@ -157,15 +171,16 @@ public class GerenciadorServicosTest {
                 servico3.getId()
         );
     }
+
     @Test
     void verificarCadastroDuplicado() {
-        GerenciadorServicos gs = new GerenciadorServicos();
         Servico servico1 = new Servico(
                 "Forro de Sala",
                 1500,
                 Categoria.FORRO,
                 4,
-                5);
+                5
+        );
         gs.cadastrarServico(servico1);
         assertThrows(
                 IllegalArgumentException.class,
@@ -176,7 +191,8 @@ public class GerenciadorServicosTest {
                 1500,
                 Categoria.FORRO,
                 4,
-                5);
+                5
+        );
         gs.cadastrarServico(servico2);
         assertEquals(
                 2,
@@ -185,6 +201,272 @@ public class GerenciadorServicosTest {
         assertEquals(
                 2,
                 gs.quantidadeServicos()
+        );
+    }
+
+    @Test
+    void buscarIdExistente() {
+        Servico servico1 = new Servico(
+                "Forro de Sala",
+                2000,
+                Categoria.FORRO,
+                4,
+                5);
+        gs.cadastrarServico(servico1);
+        assertSame(
+                servico1,
+                gs.buscarServicoPorId(1)
+        );
+    }
+
+    @Test
+    void buscarIdInvalido() {
+        Servico servico1 = new Servico(
+                "Forro de Sala",
+                2000,
+                Categoria.FORRO,
+                4,
+                5);
+        gs.cadastrarServico(servico1);
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> gs.buscarServicoPorId(-5)
+        );
+    }
+
+    @Test
+    void buscarIdInexistente() {
+        Servico servico1 = new Servico(
+                "Forro de Sala",
+                2000,
+                Categoria.FORRO,
+                4,
+                5);
+        gs.cadastrarServico(servico1);
+        assertThrows(
+                NoSuchElementException.class,
+                () -> gs.buscarServicoPorId(2)
+        );
+    }
+
+    @Test
+    void deveIniciarServicoEncontradoPorId() {
+        Servico servico1 = new Servico(
+                "Forro de Sala",
+                2000,
+                Categoria.FORRO,
+                4,
+                5);
+        gs.cadastrarServico(servico1);
+        Servico servico2 = new Servico(
+                "Parede da Cozinha",
+                1200,
+                Categoria.PAREDE,
+                3,
+                2.80);
+        gs.cadastrarServico(servico2);
+        Servico encontrado = gs.buscarServicoPorId(2);
+        encontrado.iniciarServico();
+        assertEquals(
+                Status.EM_ANDAMENTO,
+                servico2.getStatus()
+        );
+        assertEquals(
+                Status.PENDENTE,
+                servico1.getStatus()
+        );
+    }
+
+    @Test
+    void deveIniciarServicoPorId() {
+        Servico servico1 = new Servico(
+                "Forro de Sala",
+                2000,
+                Categoria.FORRO,
+                4,
+                5);
+        gs.cadastrarServico(servico1);
+        Servico servico2 = new Servico(
+                "Parede da Cozinha",
+                1200,
+                Categoria.PAREDE,
+                3,
+                2.80);
+        gs.cadastrarServico(servico2);
+        gs.iniciarServicoPorId(2);
+        assertSame(
+                Status.EM_ANDAMENTO,
+                servico2.getStatus()
+        );
+        assertSame(
+                Status.PENDENTE,
+                servico1.getStatus()
+        );
+    }
+
+    @Test
+    void deveConcluirServicoPorId() {
+        Servico servico1 = new Servico(
+                "Forro de Sala",
+                2000,
+                Categoria.FORRO,
+                4,
+                5);
+        gs.cadastrarServico(servico1);
+        Servico servico2 = new Servico(
+                "Parede da Cozinha",
+                1200,
+                Categoria.PAREDE,
+                3,
+                2.80);
+        gs.cadastrarServico(servico2);
+        gs.iniciarServicoPorId(2);
+        gs.concluirServicoPorId(2);
+        assertSame(
+                Status.CONCLUIDO,
+                servico2.getStatus()
+        );
+        assertSame(
+                Status.PENDENTE,
+                servico1.getStatus()
+        );
+    }
+
+    @Test
+    void deveCancelarServicoPorId() {
+        Servico servico1 = new Servico(
+                "Forro de Sala",
+                2000,
+                Categoria.FORRO,
+                4,
+                5);
+        gs.cadastrarServico(servico1);
+        Servico servico2 = new Servico(
+                "Parede da Cozinha",
+                1200,
+                Categoria.PAREDE,
+                3,
+                2.80);
+        gs.cadastrarServico(servico2);
+        gs.iniciarServicoPorId(2);
+        gs.cancelarServicoPorId(2);
+        assertSame(
+                Status.CANCELADO,
+                servico2.getStatus()
+        );
+        assertSame(
+                Status.PENDENTE,
+                servico1.getStatus()
+        );
+    }
+
+    @Test
+    void naoCancelarServicoConcluidoPorId() {
+        Servico servico1 = new Servico(
+                "Forro de Sala",
+                2000,
+                Categoria.FORRO,
+                4,
+                5);
+        gs.cadastrarServico(servico1);
+        Servico servico2 = new Servico(
+                "Parede da Cozinha",
+                1200,
+                Categoria.PAREDE,
+                3,
+                2.80);
+        gs.cadastrarServico(servico2);
+        gs.iniciarServicoPorId(2);
+        gs.concluirServicoPorId(2);
+        assertThrows(
+                IllegalStateException.class,
+                () -> gs.cancelarServicoPorId(2)
+        );
+        assertEquals(
+                Status.CONCLUIDO,
+                servico2.getStatus()
+        );
+    }
+    @Test
+    void verificarBuscarPorStatusComElementos() {
+        Servico servico1 = new Servico(
+                "Forro de Sala",
+                2000,
+                Categoria.FORRO,
+                4,
+                5);
+        gs.cadastrarServico(servico1);
+        Servico servico2 = new Servico(
+                "Parede da Cozinha",
+                1200,
+                Categoria.PAREDE,
+                3,
+                2.80);
+        gs.cadastrarServico(servico2);
+        Servico servico3 = new Servico(
+                "Forro da Varanda",
+                1000,
+                Categoria.FORRO,
+                2,
+                2);
+        gs.cadastrarServico(servico3);
+        gs.iniciarServicoPorId(2);
+        gs.iniciarServicoPorId(3);
+        List<Servico> servicosEM_ANDAMENTO = gs.buscarPorStatus(Status.EM_ANDAMENTO);
+        assertEquals(
+                true,
+                servicosEM_ANDAMENTO.contains(servico2)
+        );
+        assertEquals(
+                true,
+                servicosEM_ANDAMENTO.contains(servico3)
+        );
+        assertEquals(
+                2,
+                servicosEM_ANDAMENTO.size()
+        );
+    }
+    @Test
+    void verificarBuscarPorStatusSemElementos() {
+        Servico servico1 = new Servico(
+                "Forro de Sala",
+                2000,
+                Categoria.FORRO,
+                4,
+                5);
+        gs.cadastrarServico(servico1);
+        Servico servico2 = new Servico(
+                "Parede da Cozinha",
+                1200,
+                Categoria.PAREDE,
+                3,
+                2.80);
+        gs.cadastrarServico(servico2);
+        Servico servico3 = new Servico(
+                "Forro da Varanda",
+                1000,
+                Categoria.FORRO,
+                2,
+                2);
+        gs.cadastrarServico(servico3);
+        List<Servico> servicosCONCLUIDO = gs.buscarPorStatus(Status.CONCLUIDO);
+        assertEquals(
+                true,
+                servicosCONCLUIDO.isEmpty()
+        );
+    }
+    @Test
+    void verificarBuscarPorStatusNull() {
+        Servico servico1 = new Servico(
+                "Forro de Sala",
+                2000,
+                Categoria.FORRO,
+                4,
+                5);
+        gs.cadastrarServico(servico1);
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> gs.buscarPorStatus(null)
         );
     }
 }

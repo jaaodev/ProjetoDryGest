@@ -2,6 +2,7 @@ package br.com.drygest;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 public class GerenciadorServicos {
     int contadorId = 1;
@@ -70,6 +71,38 @@ public class GerenciadorServicos {
                 .mapToDouble(s -> s.getValor())
                 .sum();
         return soma;
+    }
+
+    public Servico buscarServicoPorId(int id) {
+        if (id <= 0) {
+            throw new IllegalArgumentException("Digite um id válido.");
+        }
+        return servicos.stream()
+                .filter(s -> s.getId() == id)
+                .findFirst()
+                .orElseThrow(NoSuchElementException::new);
+    }
+
+    public void iniciarServicoPorId(int id) {
+        buscarServicoPorId(id).iniciarServico();
+    }
+
+    public void concluirServicoPorId(int id) {
+        buscarServicoPorId(id).concluirServico();
+    }
+
+    public void cancelarServicoPorId(int id) {
+        buscarServicoPorId(id).cancelarServico();
+    }
+
+    public List<Servico> buscarPorStatus(Status status) {
+        if (status == null) {
+            throw new IllegalArgumentException("Status inválido.");
+        }
+        List<Servico> busca = servicos.stream()
+                .filter(s -> s.getStatus() == status)
+                .toList();
+        return busca;
     }
 
 }

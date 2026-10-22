@@ -33,7 +33,8 @@ public class Servico {
     void atribuirId(int id) {
         if (id <= 0) {
             throw new IllegalArgumentException("Id inválido, tente novamente.");
-        } if (this.id != 0) {
+        }
+        if (this.id != 0) {
             throw new IllegalStateException("O serviço já possui um id.");
         }
         this.id = id;

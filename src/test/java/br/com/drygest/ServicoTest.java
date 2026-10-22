@@ -1,89 +1,73 @@
 package br.com.drygest;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ServicoTest {
-    @Test
-    void naoDeveConcluirServicoPendente() {
-        Servico servico1 = new Servico(
+
+    private Servico servico;
+
+    @BeforeEach
+    void preparar() {
+        servico = new Servico(
                 "Forro de Sala",
                 1500,
                 Categoria.FORRO,
                 4,
-                5);
+                5
+        );
+    }
 
+    @Test
+    void naoDeveConcluirServicoPendente() {
         assertThrows(
                 IllegalStateException.class,
-                () -> servico1.concluirServico()
+                () -> servico.concluirServico()
         );
     }
     @Test
     void naoDeveConcluirServicoJaConcluido() {
-        Servico servico1 = new Servico(
-                "Forro de Sala",
-                1500,
-                Categoria.FORRO,
-                4,
-                5);
-        servico1.iniciarServico();
-        servico1.concluirServico();
+        servico.iniciarServico();
+        servico.concluirServico();
 
         assertThrows(
                 IllegalStateException.class,
-                () -> servico1.concluirServico()
+                () -> servico.concluirServico()
         );
     }
     @Test
     void deveConcluirServicoEmAndamento() {
-        Servico servico1 = new Servico(
-                "Forro de Sala",
-                1500,
-                Categoria.FORRO,
-                4,
-                5);
-        servico1.iniciarServico();
-        servico1.concluirServico();
+        servico.iniciarServico();
+        servico.concluirServico();
 
         assertEquals(
                 Status.CONCLUIDO,
-                servico1.getStatus()
+                servico.getStatus()
         );
     }
     @Test
     void verificarInicializacao() {
-        Servico servico1 = new Servico(
-                "Forro de Sala",
-                1500,
-                Categoria.FORRO,
-                4,
-                5);
-        servico1.iniciarServico();
+        servico.iniciarServico();
 
         assertEquals(
                 Status.EM_ANDAMENTO,
-                servico1.getStatus()
+                servico.getStatus()
         );
     }
     @Test
     void naoIniciarEmAndamento() {
-        Servico servico1 = new Servico(
-                "Forro de Sala",
-                1500,
-                Categoria.FORRO,
-                4,
-                5);
-        servico1.iniciarServico();
+        servico.iniciarServico();
 
         assertThrows(
                 IllegalStateException.class,
-                () -> servico1.iniciarServico()
+                () -> servico.iniciarServico()
         );
         assertEquals(
                 Status.EM_ANDAMENTO,
-                servico1.getStatus()
+                servico.getStatus()
         );
     }
     @Test
