@@ -95,6 +95,10 @@ public class GerenciadorServicos {
         buscarServicoPorId(id).cancelarServico();
     }
 
+    public void arquivarServicoPorId(int id) {
+        buscarServicoPorId(id).arquivarServico();
+    }
+
     public List<Servico> buscarPorStatus(Status status) {
         if (status == null) {
             throw new IllegalArgumentException("Status inválido.");
@@ -103,6 +107,12 @@ public class GerenciadorServicos {
                 .filter(s -> s.getStatus() == status)
                 .toList();
         return busca;
+    }
+
+    public List<Servico> buscarServicosNaoArquivados() {
+        return servicos.stream()
+                .filter(s -> !s.isArquivado())
+                .toList();
     }
 
 }

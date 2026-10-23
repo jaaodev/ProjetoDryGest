@@ -469,4 +469,105 @@ public class GerenciadorServicosTest {
                 () -> gs.buscarPorStatus(null)
         );
     }
+    @Test
+    void deveArquivarServicoPorId() {
+        Servico servico1 = new Servico(
+                "Forro de Sala",
+                2000,
+                Categoria.FORRO,
+                4,
+                5);
+        gs.cadastrarServico(servico1);
+        servico1.iniciarServico();
+        Servico servico2 = new Servico(
+                "Forro de Varanda",
+                1200,
+                Categoria.FORRO,
+                3,
+                3);
+        gs.cadastrarServico(servico2);
+        servico2.iniciarServico();
+        servico1.concluirServico();
+        gs.arquivarServicoPorId(1);
+        assertEquals(
+                true,
+                servico1.isArquivado()
+        );
+        assertEquals(
+                false,
+                servico2.isArquivado()
+        );
+    }
+    @Test
+    void naoDeveArquivarServicoEmAndamentoPorId() {
+        Servico servico1 = new Servico(
+                "Forro de Sala",
+                2000,
+                Categoria.FORRO,
+                4,
+                5);
+        gs.cadastrarServico(servico1);
+        servico1.iniciarServico();
+        Servico servico2 = new Servico(
+                "Forro de Varanda",
+                1200,
+                Categoria.FORRO,
+                3,
+                3);
+        gs.cadastrarServico(servico2);
+        servico2.iniciarServico();
+        servico1.concluirServico();
+        assertThrows(
+                IllegalStateException.class,
+                () -> gs.arquivarServicoPorId(2)
+        );
+        assertEquals(
+                false,
+                servico1.isArquivado()
+        );
+        assertEquals(
+                false,
+                servico2.isArquivado()
+        );
+    }
+    @Test
+    void naoDeveArquivarServicoComIdInexistente() {
+        assertThrows(
+                NoSuchElementException.class,
+                () -> gs.arquivarServicoPorId(4)
+        );
+    }
+    @Test
+    void deveBuscarServicosNaoArquivados() {
+        Servico servico1 = new Servico(
+                "Forro de Sala",
+                2000,
+                Categoria.FORRO,
+                4,
+                5);
+        gs.cadastrarServico(servico1);
+        servico1.iniciarServico();
+        Servico servico2 = new Servico(
+                "Forro de Varanda",
+                1200,
+                Categoria.FORRO,
+                3,
+                3);
+        gs.cadastrarServico(servico2);
+        servico2.iniciarServico();
+        servico2.concluirServico();
+        gs.arquivarServicoPorId(2);
+        gs.buscarServicosNaoArquivados();
+        List<Servico> servicosNaoArquivados = gs.buscarServicosNaoArquivados();
+        assertTrue(
+                servicosNaoArquivados.contains(servico1)
+        );
+        assertEquals(
+                1,
+                servicosNaoArquivados.size()
+        );
+        assertFalse(
+                servicosNaoArquivados.contains(servico2)
+        );
+    }
 }

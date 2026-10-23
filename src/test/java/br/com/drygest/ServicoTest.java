@@ -3,8 +3,7 @@ package br.com.drygest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ServicoTest {
 
@@ -192,6 +191,51 @@ public class ServicoTest {
         assertEquals(
                 1,
                 servico1.getId()
+        );
+    }
+    @Test
+    void deveArquivarServicoConcluido() {
+        servico.iniciarServico();
+        servico.concluirServico();
+        servico.arquivarServico();
+        assertEquals(
+                true,
+                servico.isArquivado()
+        );
+    }
+    @Test
+    void deveArquivarServicoCancelado() {
+        servico.iniciarServico();
+        servico.cancelarServico();
+        servico.arquivarServico();
+        assertEquals(
+                true,
+                servico.isArquivado()
+        );
+    }
+    @Test
+    void naoDeveArquivarServicoPendente() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> servico.arquivarServico()
+        );
+        assertEquals(
+                false,
+                servico.isArquivado()
+        );
+    }
+    @Test
+    void naoDeveArquivarServicoDuasVezes() {
+        servico.iniciarServico();
+        servico.cancelarServico();
+        servico.arquivarServico();
+        assertThrows(
+                IllegalStateException.class,
+                () -> servico.arquivarServico()
+        );
+        assertEquals(
+                true,
+                servico.isArquivado()
         );
     }
 }

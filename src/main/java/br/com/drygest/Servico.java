@@ -8,6 +8,7 @@ public class Servico {
     private Status status;
     private double largura;
     private double comprimento;
+    private boolean arquivado;
 
     public Servico(String nome, double valor, Categoria categoria, double largura, double comprimento) {
         setNome(nome);
@@ -61,13 +62,32 @@ public class Servico {
     }
 
     public void cancelarServico() {
-        if (this.status == Status.PENDENTE || this.status == Status.EM_ANDAMENTO) {
+        if (this.status == Status.PENDENTE ||
+                this.status == Status.EM_ANDAMENTO) {
             this.status = Status.CANCELADO;
         } else {
             throw new IllegalStateException(
                     "Não é possível cancelar esse serviço."
             );
         }
+    }
+
+    public boolean isArquivado() {
+        return this.arquivado;
+    }
+
+    public void arquivarServico() {
+        if (this.status == Status.PENDENTE ||
+                this.status == Status.EM_ANDAMENTO) {
+            throw new IllegalStateException(
+                    "Não é possível arquivar um serviço com o status: PENDENTE/EM_ANDAMENTO."
+            );
+        } if (isArquivado()) {
+            throw new IllegalStateException(
+                    "Não é possível arquivar um serviço que já está arquivado."
+            );
+        }
+        this.arquivado = true;
     }
 
     public double calcularArea() {
