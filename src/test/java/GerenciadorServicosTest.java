@@ -557,8 +557,8 @@ public class GerenciadorServicosTest {
         servico2.iniciarServico();
         servico2.concluirServico();
         gs.arquivarServicoPorId(2);
-        gs.buscarServicosNaoArquivados();
-        List<Servico> servicosNaoArquivados = gs.buscarServicosNaoArquivados();
+        gs.buscarPorArquivamento(false);
+        List<Servico> servicosNaoArquivados = gs.buscarPorArquivamento(false);
         assertTrue(
                 servicosNaoArquivados.contains(servico1)
         );
@@ -568,6 +568,33 @@ public class GerenciadorServicosTest {
         );
         assertFalse(
                 servicosNaoArquivados.contains(servico2)
+        );
+    }
+    @Test
+    void deveRetornarListaVaziaQuandoTodosArquivados() {
+        Servico servico1 = new Servico(
+                "Forro de Sala",
+                2000,
+                Categoria.FORRO,
+                4,
+                5);
+        gs.cadastrarServico(servico1);
+        servico1.iniciarServico();
+        servico1.concluirServico();
+        Servico servico2 = new Servico(
+                "Forro de Varanda",
+                1200,
+                Categoria.FORRO,
+                3,
+                3);
+        gs.cadastrarServico(servico2);
+        servico2.iniciarServico();
+        servico2.concluirServico();
+        gs.arquivarServicoPorId(1);
+        gs.arquivarServicoPorId(2);
+        List<Servico> servicosNaoArquivados = gs.buscarPorArquivamento(false);
+        assertTrue(
+                servicosNaoArquivados.isEmpty()
         );
     }
 }

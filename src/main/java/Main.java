@@ -3,75 +3,194 @@ import br.com.drygest.GerenciadorServicos;
 import br.com.drygest.Servico;
 import br.com.drygest.Status;
 
+import java.util.InputMismatchException;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
         GerenciadorServicos gs = new GerenciadorServicos();
-        Servico servico1 = new Servico("Forro de Sala", 1500, Categoria.FORRO, 4, 5);
-        Servico servico2 = new Servico("Parede de Drywall", 2000, Categoria.PAREDE, 3, 4);
-        Servico servico3 = new Servico("Forro de Cozinha", 800, Categoria.FORRO, 2, 3);
-        gs.cadastrarServico(servico1);
-        gs.cadastrarServico(servico2);
-        gs.cadastrarServico(servico3);
-        gs.verServicos();
-        System.out.println(
-                "Quantidade de serviços: " + gs.quantidadeServicos()
-        );
+        int opcao = -1;
 
-        System.out.println("Buscando serviços da categoria FORRO...");
-        gs.buscarPorCategoria(Categoria.FORRO).forEach(s -> System.out.println(s.getNome()));
+        do {
 
-        System.out.println("Buscando serviços da categoria SANCA...");
-        List<Servico> sanca = gs.buscarPorCategoria(Categoria.SANCA);
-        if (sanca.isEmpty()) {
-            sanca.forEach(s -> System.out.println(s.getNome()));
+            System.out.println("======== DryGest ========");
+            System.out.println();
+            System.out.println("1 - Cadastrar Serviço");
+            System.out.println("2 - Listar Serviços");
+            System.out.println("3 - Iniciar serviço");
+            System.out.println("4 - Concluir serviço");
+            System.out.println("5 - Cancelar serviço");
+            System.out.println("6 - Arquivar serviço");
+            System.out.println("7 - Histórico de serviços");
+            System.out.println("0 - Sair");
+            System.out.println();
+            System.out.println("Escolha uma opção: ");
+            try {
+                opcao = sc.nextInt();
+                sc.nextLine();
+            } catch (InputMismatchException e) {
+                System.out.println("Digite um número válido.");
+                sc.nextLine();
+                continue;
+            }
+            switch (opcao) {
+                case 1:
+                    cadastrarServico(sc, gs);
+                    break;
+                case 2:
+                    gs.verServicos();
+                    break;
+                case 3:
+                    iniciarServico(sc, gs);
+                    break;
+                case 4:
+                    concluirServico(sc, gs);
+                    break;
+                case 5:
+                    cancelarServico(sc, gs);
+                    break;
+                case 6:
+                    arquivarServico(sc, gs);
+                    break;
+                case 7:
+                    historicoServico(gs);
+                    break;
+                case 0:
+                    System.out.println("Saindo...");
+                    break;
+                default:
+                    System.out.println("Opcão inválida, tente novamente.");
+                    break;
+            }
+
+        } while (opcao != 0);
+    }
+
+    private static void cadastrarServico(
+            Scanner sc,
+            GerenciadorServicos gs
+    ) {
+        System.out.println("Cadastro de serviço selecionado.");
+        System.out.print("Digite o nome do serviço: ");
+        String nomeServico = sc.nextLine();
+        System.out.println("Digite o valor do serviço: ");
+        double valorServico = sc.nextDouble();
+        System.out.println("Digite a largura: ");
+        double largura = sc.nextDouble();
+        System.out.println("Digite o comprimento: ");
+        double comprimento = sc.nextDouble();
+        System.out.println("Escolha a categoria do serviço: ");
+        System.out.println();
+        System.out.println("1 - FORRO");
+        System.out.println("2 - PAREDE");
+        System.out.println("3 - SANCA");
+        System.out.println("4 - LINEAR");
+        System.out.println();
+        System.out.println("Digite a opção: ");
+        Categoria categoria;
+        int opcaoCategoria = sc.nextInt();
+        switch (opcaoCategoria) {
+            case 1:
+                categoria = Categoria.FORRO;
+                break;
+            case 2:
+                categoria = Categoria.PAREDE;
+                break;
+            case 3:
+                categoria = Categoria.SANCA;
+                break;
+            case 4:
+                categoria = Categoria.LINEAR;
+                break;
+            default:
+                System.out.println("Opção inválida.");
+                return;
+        }
+        Servico servico = new Servico(nomeServico, valorServico, categoria, largura, comprimento);
+        gs.cadastrarServico(servico);
+        System.out.println("Serviço cadastrado com sucesso!");
+        System.out.println("ID: " + servico.getId());
+        System.out.println("Nome do serviço: " + servico.getNome());
+        System.out.println("Categoria: " + servico.getCategoria());
+        System.out.println("Valor: R$ " + servico.getValor());
+        System.out.println("Área: " + servico.calcularArea()
+                + "m²");
+    }
+
+    private static void iniciarServico(
+            Scanner sc,
+            GerenciadorServicos gs
+    ) {
+        try {
+            System.out.println("Digite o ID do serviço que será iniciado: ");
+            gs.iniciarServicoPorId(sc.nextInt());
+            System.out.println("Serviço iniciado com sucesso!");
+        } catch (NoSuchElementException e) {
+            System.out.println("Serviço não encontrado.");
+        } catch (IllegalStateException e) {
+            System.out.println("Não é possível iniciar esse serviço.");
+        }
+    }
+
+    private static void concluirServico(
+            Scanner sc,
+            GerenciadorServicos gs
+    ) {
+        try {
+            System.out.println("Digite o ID do serviço que será concluído: ");
+            gs.concluirServicoPorId(sc.nextInt());
+            System.out.println("Serviço concluido com sucesso!");
+        } catch (NoSuchElementException e) {
+            System.out.println("Serviço não encontrado.");
+        } catch (IllegalStateException e) {
+            System.out.println("Não é possível concluir esse serviço.");
+        }
+    }
+
+    private static void cancelarServico(
+            Scanner sc,
+            GerenciadorServicos gs
+    ) {
+        try {
+            System.out.println("Digite o ID do serviço que será cancelado: ");
+            gs.cancelarServicoPorId(sc.nextInt());
+            System.out.println("Serviço cancelado com sucesso!");
+        } catch (NoSuchElementException e) {
+            System.out.println("Serviço não encontrado.");
+        } catch (IllegalStateException e) {
+            System.out.println("Não é possível cancelar esse serviço.");
+        }
+    }
+
+    private static void arquivarServico(
+            Scanner sc,
+            GerenciadorServicos gs
+    ) {
+        try {
+            System.out.println("Digite o ID do serviço que será arquivado: ");
+            gs.arquivarServicoPorId(sc.nextInt());
+            System.out.println("Serviço arquivado com sucesso!");
+        } catch (NoSuchElementException e) {
+            System.out.println("Serviço não encontrado.");
+        } catch (IllegalStateException e) {
+            System.out.println("Não é possível arquivar esse serviço.");
+        }
+    }
+
+    private static void historicoServico(GerenciadorServicos gs) {
+        System.out.println("======== HISTÓRICO DE SERVIÇOS ========");
+        List<Servico> resultado = gs.buscarPorArquivamento(true);
+        if (resultado.isEmpty()) {
+            System.out.println("Histórico vazio...");
         } else {
-            System.out.println("Nenhum serviço encontrado.");
+            resultado.forEach(s -> System.out.println("ID: " + s.getId()
+                    + " | Serviço: " + s.getNome()
+                    + " | Valor: R$" + s.getValor()
+                    + " | Categoria: " + s.getCategoria()
+                    + " | Status: " + s.getStatus()));
         }
-
-        try {
-            gs.buscarPorCategoria(null).forEach(s -> System.out.println(s.getNome()));
-        } catch (IllegalArgumentException e) {
-            System.out.println(e.getMessage());
-        }
-
-        System.out.println("O valor total de todos os serviços contratados é de R$"+gs.somaTotalDosValores());
-
-
-        System.out.println("O valor total dos serviços da categoria FORRO é de R$"+gs.somaValoresPorCategoria(Categoria.FORRO));
-        System.out.println("O valor total dos serviços da categoria PAREDE é de R$"+gs.somaValoresPorCategoria(Categoria.PAREDE));
-        System.out.println("O valor total dos serviços da categoria SANCA é de R$"+gs.somaValoresPorCategoria(Categoria.SANCA));
-        try {
-            System.out.println("O valor total dos serviços da categoria null é de R$" + gs.somaValoresPorCategoria(null));
-        } catch (IllegalArgumentException e) {
-            System.out.println(e.getMessage());
-        }
-
-        servico1.iniciarServico();
-        System.out.println("br.com.drygest.Status do serviço: " + servico1.getStatus());
-        try {
-            servico1.iniciarServico();
-        } catch (IllegalStateException e) {
-            System.out.println(e.getMessage());
-        }
-
-        servico1.concluirServico();
-        System.out.println("br.com.drygest.Status do serviço: " + servico1.getStatus());
-        try {
-            servico1.concluirServico();
-        } catch (IllegalStateException e) {
-            System.out.println(e.getMessage());
-        }
-
-        double somaStatus = gs.somaValoresPorStatus(Status.PENDENTE);
-        System.out.println("A soma dos valores PENDENTES é de R$"+somaStatus);
-
-        try {
-            gs.cadastrarServico(servico1);
-        } catch (IllegalArgumentException e) {
-            System.out.println(e.getMessage());
-        }
-
     }
 }

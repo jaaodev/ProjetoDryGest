@@ -24,10 +24,18 @@ public class GerenciadorServicos {
     }
 
     public void verServicos() {
-        this.servicos.forEach(s -> System.out.println("Serviço: " + s.getNome()
-                + ", Valor: R$" + s.getValor()
-                + ", br.com.drygest.Categoria: " + s.getCategoria()
-                + ", br.com.drygest.Status: " + s.getStatus()));
+        List<Servico> lista = buscarPorArquivamento(false);
+        if (lista.isEmpty()) {
+            System.out.println("Nenhum serviço cadastrado.");
+            return;
+        }
+        System.out.println("======== LISTA DE SERVIÇOS ========");
+        System.out.println();
+        lista.forEach(s -> System.out.println("ID: " + s.getId()
+                + " | Serviço: " + s.getNome()
+                + " | Valor: R$" + s.getValor()
+                + " | Categoria: " + s.getCategoria()
+                + " | Status: " + s.getStatus()));
     }
 
     public int quantidadeServicos() {
@@ -109,10 +117,9 @@ public class GerenciadorServicos {
         return busca;
     }
 
-    public List<Servico> buscarServicosNaoArquivados() {
+    public List<Servico> buscarPorArquivamento(boolean arquivado) {
         return servicos.stream()
-                .filter(s -> !s.isArquivado())
+                .filter(s -> s.isArquivado() == arquivado)
                 .toList();
     }
-
 }
