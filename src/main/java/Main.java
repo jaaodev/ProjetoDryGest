@@ -3,21 +3,18 @@ import br.com.drygest.GerenciadorServicos;
 import br.com.drygest.Servico;
 import br.com.drygest.Status;
 
-import java.util.InputMismatchException;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Scanner;
+import java.text.NumberFormat;
+import java.util.*;
 
 public class Main {
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
         GerenciadorServicos gs = new GerenciadorServicos();
-        int opcao = -1;
+        int opcao;
 
         do {
 
             System.out.println("======== DryGest ========");
-            System.out.println();
             System.out.println("1 - Cadastrar Serviço");
             System.out.println("2 - Listar Serviços");
             System.out.println("3 - Iniciar serviço");
@@ -26,22 +23,14 @@ public class Main {
             System.out.println("6 - Arquivar serviço");
             System.out.println("7 - Histórico de serviços");
             System.out.println("0 - Sair");
-            System.out.println();
             System.out.println("Escolha uma opção: ");
-            try {
-                opcao = sc.nextInt();
-                sc.nextLine();
-            } catch (InputMismatchException e) {
-                System.out.println("Digite um número válido.");
-                sc.nextLine();
-                continue;
-            }
+            opcao = lerInteiro(sc);
             switch (opcao) {
                 case 1:
                     cadastrarServico(sc, gs);
                     break;
                 case 2:
-                    gs.verServicos();
+                    listarServicos(gs);
                     break;
                 case 3:
                     iniciarServico(sc, gs);
@@ -56,7 +45,7 @@ public class Main {
                     arquivarServico(sc, gs);
                     break;
                 case 7:
-                    historicoServico(gs);
+                    historicoServicosArquivados(gs);
                     break;
                 case 0:
                     System.out.println("Saindo...");
@@ -77,21 +66,19 @@ public class Main {
         System.out.print("Digite o nome do serviço: ");
         String nomeServico = sc.nextLine();
         System.out.println("Digite o valor do serviço: ");
-        double valorServico = sc.nextDouble();
+        double valorServico = lerDouble(sc);
         System.out.println("Digite a largura: ");
-        double largura = sc.nextDouble();
+        double largura = lerDouble(sc);
         System.out.println("Digite o comprimento: ");
-        double comprimento = sc.nextDouble();
+        double comprimento = lerDouble(sc);
         System.out.println("Escolha a categoria do serviço: ");
-        System.out.println();
         System.out.println("1 - FORRO");
         System.out.println("2 - PAREDE");
         System.out.println("3 - SANCA");
         System.out.println("4 - LINEAR");
-        System.out.println();
         System.out.println("Digite a opção: ");
         Categoria categoria;
-        int opcaoCategoria = sc.nextInt();
+        int opcaoCategoria = lerInteiro(sc);
         switch (opcaoCategoria) {
             case 1:
                 categoria = Categoria.FORRO;
@@ -109,15 +96,20 @@ public class Main {
                 System.out.println("Opção inválida.");
                 return;
         }
-        Servico servico = new Servico(nomeServico, valorServico, categoria, largura, comprimento);
-        gs.cadastrarServico(servico);
-        System.out.println("Serviço cadastrado com sucesso!");
-        System.out.println("ID: " + servico.getId());
-        System.out.println("Nome do serviço: " + servico.getNome());
-        System.out.println("Categoria: " + servico.getCategoria());
-        System.out.println("Valor: R$ " + servico.getValor());
-        System.out.println("Área: " + servico.calcularArea()
-                + "m²");
+        try {
+            Servico servico = new Servico(nomeServico, valorServico, categoria, largura, comprimento);
+            gs.cadastrarServico(servico);
+            System.out.println("Serviço cadastrado com sucesso!");
+            System.out.println("ID: " + servico.getId());
+            System.out.println("Nome do serviço: " + servico.getNome());
+            System.out.println("Categoria: " + servico.getCategoria());
+            System.out.println("Valor: " + formatarMoeda(servico.getValor()));
+            System.out.println("Área: " + servico.calcularArea()
+                    + "m²");
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+        }
+
     }
 
     private static void iniciarServico(
@@ -126,8 +118,9 @@ public class Main {
     ) {
         try {
             System.out.println("Digite o ID do serviço que será iniciado: ");
-            gs.iniciarServicoPorId(sc.nextInt());
-            System.out.println("Serviço iniciado com sucesso!");
+            int id = lerInteiro(sc);
+            gs.iniciarServicoPorId(id);
+            System.out.println("Serviço #"+ id +" iniciado com sucesso!");
         } catch (NoSuchElementException e) {
             System.out.println("Serviço não encontrado.");
         } catch (IllegalStateException e) {
@@ -141,8 +134,9 @@ public class Main {
     ) {
         try {
             System.out.println("Digite o ID do serviço que será concluído: ");
-            gs.concluirServicoPorId(sc.nextInt());
-            System.out.println("Serviço concluido com sucesso!");
+            int id = lerInteiro(sc);
+            gs.concluirServicoPorId(id);
+            System.out.println("Serviço #"+ id +" concluido com sucesso!");
         } catch (NoSuchElementException e) {
             System.out.println("Serviço não encontrado.");
         } catch (IllegalStateException e) {
@@ -156,8 +150,9 @@ public class Main {
     ) {
         try {
             System.out.println("Digite o ID do serviço que será cancelado: ");
-            gs.cancelarServicoPorId(sc.nextInt());
-            System.out.println("Serviço cancelado com sucesso!");
+            int id = lerInteiro(sc);
+            gs.cancelarServicoPorId(id);
+            System.out.println("Serviço #"+ id +" cancelado com sucesso!");
         } catch (NoSuchElementException e) {
             System.out.println("Serviço não encontrado.");
         } catch (IllegalStateException e) {
@@ -171,8 +166,9 @@ public class Main {
     ) {
         try {
             System.out.println("Digite o ID do serviço que será arquivado: ");
-            gs.arquivarServicoPorId(sc.nextInt());
-            System.out.println("Serviço arquivado com sucesso!");
+            int id = lerInteiro(sc);
+            gs.arquivarServicoPorId(id);
+            System.out.println("Serviço #"+ id +" arquivado com sucesso!");
         } catch (NoSuchElementException e) {
             System.out.println("Serviço não encontrado.");
         } catch (IllegalStateException e) {
@@ -180,17 +176,65 @@ public class Main {
         }
     }
 
-    private static void historicoServico(GerenciadorServicos gs) {
-        System.out.println("======== HISTÓRICO DE SERVIÇOS ========");
-        List<Servico> resultado = gs.buscarPorArquivamento(true);
-        if (resultado.isEmpty()) {
-            System.out.println("Histórico vazio...");
-        } else {
-            resultado.forEach(s -> System.out.println("ID: " + s.getId()
-                    + " | Serviço: " + s.getNome()
-                    + " | Valor: R$" + s.getValor()
-                    + " | Categoria: " + s.getCategoria()
-                    + " | Status: " + s.getStatus()));
+    private static int lerInteiro(Scanner sc) {
+        while (true) {
+            int numeroInteiro;
+            try {
+                numeroInteiro = sc.nextInt();
+                sc.nextLine();
+                return numeroInteiro;
+            } catch (InputMismatchException e) {
+                System.out.println("Digite um número válido.");
+                sc.nextLine();
+            }
         }
+    }
+
+    private static double lerDouble(Scanner sc) {
+        while (true) {
+            double numeroDouble;
+            try {
+                numeroDouble = sc.nextDouble();
+                sc.nextLine();
+                return numeroDouble;
+            } catch (InputMismatchException e) {
+                System.out.println("Digite um número válido.");
+                sc.nextLine();
+            }
+        }
+    }
+
+    private static String formatarMoeda(double valor) {
+        Locale brasil = Locale.of("pt", "BR");
+
+        NumberFormat formatoMoeda =
+                NumberFormat.getCurrencyInstance(brasil);
+        return formatoMoeda.format(valor);
+    }
+
+    private static void exibirServico(Servico servico) {
+        System.out.println("ID: " + servico.getId()
+                + " | Serviço: " + servico.getNome()
+                + " | Valor: " + formatarMoeda(servico.getValor())
+                + " | Categoria: " + servico.getCategoria()
+                + " | Status: " + servico.getStatus());
+    }
+
+    private static void listarServicos(GerenciadorServicos gs) {
+        List<Servico> servicos = gs.buscarPorArquivamento(false);
+        if (servicos.isEmpty()) {
+            System.out.println("Nenhum serviço encontrado.");
+            return;
+        } System.out.println("======== LISTA DE SERVIÇOS ========");
+        servicos.forEach(Main::exibirServico);
+    }
+
+    private static void historicoServicosArquivados(GerenciadorServicos gs) {
+        List<Servico> servicos = gs.buscarPorArquivamento(true);
+        if (servicos.isEmpty()) {
+            System.out.println("Nenhum serviço arquivado encontrado.");
+            return;
+        } System.out.println("======== HISTÓRICO DE SERVIÇOS ARQUIVADOS ========");
+        servicos.forEach(Main::exibirServico);
     }
 }
