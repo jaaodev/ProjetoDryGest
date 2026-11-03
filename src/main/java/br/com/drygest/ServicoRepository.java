@@ -65,7 +65,7 @@ public class ServicoRepository {
     public void atualizarStatus(Servico original, Servico copia) throws SQLException {
         String sql = "UPDATE servicos\n" +
                 "SET status = ?\n" +
-                "WHERE id = ?" +
+                "WHERE id = ? " +
                 "AND status = ?;";
         try (Connection conexao = ConexaoPostgreSQL.conectar();
              PreparedStatement comando = conexao.prepareStatement(sql)) {
@@ -85,7 +85,7 @@ public class ServicoRepository {
     public void atualizarArquivamento(Servico original, Servico copia) throws SQLException {
         String sql = "UPDATE servicos\n" +
                 "SET arquivado = ?\n" +
-                "WHERE id = ?" +
+                "WHERE id = ? " +
                 "AND arquivado = ?;";
         try (Connection conexao = ConexaoPostgreSQL.conectar();
              PreparedStatement comando = conexao.prepareStatement(sql)) {

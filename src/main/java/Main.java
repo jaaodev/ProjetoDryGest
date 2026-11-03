@@ -34,7 +34,7 @@ public class Main {
             System.out.println("4 - Concluir serviço");
             System.out.println("5 - Cancelar serviço");
             System.out.println("6 - Arquivar serviço");
-            System.out.println("7 - Histórico de serviços");
+            System.out.println("7 - Listar serviços arquivados");
             System.out.println("8 - Atualizar serviços");
             System.out.println("0 - Sair");
             System.out.println("Escolha uma opção: ");
@@ -279,7 +279,7 @@ public class Main {
             System.out.println("Nenhum serviço arquivado encontrado.");
             return;
         }
-        System.out.println("======== HISTÓRICO DE SERVIÇOS ARQUIVADOS ========");
+        System.out.println("======== LISTA DE SERVIÇOS ARQUIVADOS ========");
         servicos.forEach(Main::exibirServico);
     }
 
