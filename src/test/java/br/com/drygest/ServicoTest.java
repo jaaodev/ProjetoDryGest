@@ -3,6 +3,8 @@ package br.com.drygest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.sql.SQLException;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ServicoTest {
@@ -175,7 +177,7 @@ public class ServicoTest {
         );
     }
     @Test
-    void verificarAlteracaoId() {
+    void verificarAlteracaoId() throws SQLException {
         GerenciadorServicos gs = new GerenciadorServicos();
         Servico servico1 = new Servico(
                 "Forro de Sala",
@@ -198,8 +200,7 @@ public class ServicoTest {
         servico.iniciarServico();
         servico.concluirServico();
         servico.arquivarServico();
-        assertEquals(
-                true,
+        assertTrue(
                 servico.isArquivado()
         );
     }
@@ -208,8 +209,7 @@ public class ServicoTest {
         servico.iniciarServico();
         servico.cancelarServico();
         servico.arquivarServico();
-        assertEquals(
-                true,
+        assertTrue(
                 servico.isArquivado()
         );
     }
@@ -219,8 +219,7 @@ public class ServicoTest {
                 IllegalStateException.class,
                 () -> servico.arquivarServico()
         );
-        assertEquals(
-                false,
+        assertFalse(
                 servico.isArquivado()
         );
     }
@@ -233,9 +232,87 @@ public class ServicoTest {
                 IllegalStateException.class,
                 () -> servico.arquivarServico()
         );
-        assertEquals(
-                true,
+        assertTrue(
                 servico.isArquivado()
         );
+    }
+    @Test
+    void deveRestaurarServicoConcluidoArquivado() {
+        Servico servico = Servico.restaurar(
+                7,
+                "Forro da cozinha",
+                2500,
+                Categoria.FORRO,
+                Status.CONCLUIDO,
+                4,
+                5,
+                true
+        );
+        assertEquals(
+                7,
+                servico.getId()
+        );
+        assertEquals(
+                "Forro da cozinha",
+                servico.getNome()
+        );
+        assertEquals(
+                2500,
+                servico.getValor()
+        );
+        assertEquals(
+                Categoria.FORRO,
+                servico.getCategoria()
+        );
+        assertEquals(
+                Status.CONCLUIDO,
+                servico.getStatus()
+        );
+        assertEquals(
+                4,
+                servico.getLargura()
+        );
+        assertEquals(
+                5,
+                servico.getComprimento()
+        );
+        assertTrue(
+                servico.getArquivado()
+        );
+    }
+    @Test
+    void naoDeveRestaurarServicoPendenteArquivado() {
+        assertThrows(IllegalStateException.class, () ->
+                Servico.restaurar(
+                        7,
+                        "Forro da cozinha",
+                        2500,
+                        Categoria.FORRO,
+                        Status.PENDENTE,
+                        4,
+                        5,
+                        true
+                )
+        );
+    }
+    @Test
+    void deveCriarCopiaIndependenteDoServico() {
+        Servico original = Servico.restaurar(
+                7,
+                "Forro do quarto",
+                1500,
+                Categoria.FORRO,
+                Status.PENDENTE,
+                5,
+                4,
+                false
+        );
+        assertEquals(Status.PENDENTE, original.getStatus());
+        Servico copia = original.copiar();
+        copia.iniciarServico();
+        assertEquals(Status.PENDENTE, original.getStatus());
+        assertEquals(Status.EM_ANDAMENTO, copia.getStatus());
+        assertEquals(original.getId(), copia.getId());
+        assertNotSame(original, copia);
     }
 }

@@ -1,5 +1,6 @@
 package br.com.drygest;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -7,20 +8,30 @@ import java.util.NoSuchElementException;
 public class GerenciadorServicos {
     int contadorId = 1;
     private List<Servico> servicos;
+    private final ServicoRepository repository;
 
     public GerenciadorServicos() {
+        this.repository = null;
         this.servicos = new ArrayList<>();
     }
 
-    public void cadastrarServico(Servico servico) {
+    public GerenciadorServicos(ServicoRepository repository) {
+        this.repository = repository;
+        this.servicos = new ArrayList<>();
+    }
+
+    public void cadastrarServico(Servico servico) throws SQLException {
         if (servico == null) {
             throw new IllegalArgumentException("Cadastre um serviço válido.");
         } else if (this.servicos.contains(servico)) {
-            throw new IllegalArgumentException("Serviço já cadastrado, tente novamente.");
+            throw new IllegalArgumentException("Serviço já cadastrado.");
         }
-        servico.atribuirId(this.contadorId);
-        this.servicos.add(servico);
-        this.contadorId++;
+        if (usaPersistencia()) {
+                repository.salvar(servico);
+        } else {
+            servico.atribuirId(this.contadorId);
+            this.contadorId++;
+        } this.servicos.add(servico);
     }
 
     public void verServicos() {
@@ -91,20 +102,60 @@ public class GerenciadorServicos {
                 .orElseThrow(NoSuchElementException::new);
     }
 
-    public void iniciarServicoPorId(int id) {
-        buscarServicoPorId(id).iniciarServico();
+    public void iniciarServicoPorId(int id) throws SQLException {
+        Servico original = buscarServicoPorId(id);
+        Servico copia = original.copiar();
+
+        copia.iniciarServico();
+
+        if (repository != null) {
+            repository.atualizarStatus(original, copia);
+        }
+
+        original.iniciarServico();
+
     }
 
-    public void concluirServicoPorId(int id) {
-        buscarServicoPorId(id).concluirServico();
+    public void concluirServicoPorId(int id) throws SQLException {
+        Servico original = buscarServicoPorId(id);
+        Servico copia = original.copiar();
+
+        copia.concluirServico();
+
+        if (repository != null) {
+            repository.atualizarStatus(original, copia);
+        }
+
+        original.concluirServico();
+
     }
 
-    public void cancelarServicoPorId(int id) {
-        buscarServicoPorId(id).cancelarServico();
+    public void cancelarServicoPorId(int id) throws SQLException {
+        Servico original = buscarServicoPorId(id);
+        Servico copia = original.copiar();
+
+        copia.cancelarServico();
+
+        if (repository != null) {
+            repository.atualizarStatus(original, copia);
+        }
+
+        original.cancelarServico();
+
     }
 
-    public void arquivarServicoPorId(int id) {
-        buscarServicoPorId(id).arquivarServico();
+    public void arquivarServicoPorId(int id) throws SQLException {
+        Servico original = buscarServicoPorId(id);
+        Servico copia = original.copiar();
+
+        copia.arquivarServico();
+
+        if (repository != null) {
+            repository.atualizarArquivamento(original, copia);
+        }
+
+        original.arquivarServico();
+
     }
 
     public List<Servico> buscarPorStatus(Status status) {
@@ -121,5 +172,15 @@ public class GerenciadorServicos {
         return servicos.stream()
                 .filter(s -> s.isArquivado() == arquivado)
                 .toList();
+    }
+
+    private boolean usaPersistencia() {
+        return repository != null;
+    }
+
+    public void carregarServicos() throws SQLException {
+        if (usaPersistencia()) {
+            this.servicos = repository.buscarTodos();
+        }
     }
 }

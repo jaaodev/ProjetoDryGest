@@ -72,10 +72,6 @@ public class Servico {
         }
     }
 
-    public boolean isArquivado() {
-        return this.arquivado;
-    }
-
     public void arquivarServico() {
         if (this.status == Status.PENDENTE ||
                 this.status == Status.EM_ANDAMENTO) {
@@ -90,12 +86,49 @@ public class Servico {
         this.arquivado = true;
     }
 
+    public boolean isArquivado() {
+        return this.arquivado;
+    }
+
     public double calcularArea() {
         return this.largura * this.comprimento;
     }
 
     public double calcularMetroSanca() {
         return this.largura + this.comprimento + this.largura + this.comprimento;
+    }
+
+    public static Servico restaurar(int id,
+                                    String nome,
+                                    double valor,
+                                    Categoria categoria,
+                                    Status status,
+                                    double largura,
+                                    double comprimento,
+                                    boolean arquivado) {
+        if (id <= 0) {
+            throw new IllegalArgumentException(
+                    "Id inválido."
+            );
+        } if (status == null) {
+            throw new IllegalArgumentException(
+                    "Status não pode ser null."
+            );
+        } if (arquivado && (status == Status.PENDENTE ||
+                status == Status.EM_ANDAMENTO)) {
+            throw new IllegalStateException(
+                    "Status inválido para serviço arquivado."
+            );
+        }
+        Servico servico =  new Servico(nome, valor, categoria, largura, comprimento);
+        servico.atribuirId(id);
+        servico.status = status;
+        servico.arquivado = arquivado;
+        return  servico;
+    }
+
+    public Servico copiar() {
+        return Servico.restaurar(id, nome, valor, categoria, status, largura, comprimento, arquivado);
     }
 
     public int getId() {
@@ -131,6 +164,10 @@ public class Servico {
 
     public double getComprimento() {
         return comprimento;
+    }
+
+    public boolean getArquivado() {
+        return arquivado;
     }
 
 }

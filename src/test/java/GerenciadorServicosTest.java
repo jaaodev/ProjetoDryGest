@@ -5,6 +5,7 @@ import br.com.drygest.Status;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.sql.SQLException;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -34,7 +35,7 @@ public class GerenciadorServicosTest {
     }
 
     @Test
-    void deveSomarPorCategoria() {
+    void deveSomarPorCategoria() throws SQLException {
         Servico servico1 = new Servico(
                 "Forro de Sala",
                 1500,
@@ -60,7 +61,7 @@ public class GerenciadorServicosTest {
     }
 
     @Test
-    void relatorioDinamico() {
+    void relatorioDinamico() throws SQLException {
         Servico servico1 = new Servico(
                 "Forro de Sala",
                 2000,
@@ -90,7 +91,7 @@ public class GerenciadorServicosTest {
     }
 
     @Test
-    void rejeitarOMesmoObjeto() {
+    void rejeitarOMesmoObjeto() throws SQLException {
         Servico servico1 = new Servico(
                 "Forro de Sala",
                 2000,
@@ -109,7 +110,7 @@ public class GerenciadorServicosTest {
     }
 
     @Test
-    void verificarObjetosParecidos() {
+    void verificarObjetosParecidos() throws SQLException {
         Servico servico1 = new Servico(
                 "Forro de Sala",
                 2000,
@@ -133,7 +134,7 @@ public class GerenciadorServicosTest {
     }
 
     @Test
-    void verificarIds() {
+    void verificarIds() throws SQLException {
         Servico servico1 = new Servico(
                 "Forro de Sala",
                 1500,
@@ -173,7 +174,7 @@ public class GerenciadorServicosTest {
     }
 
     @Test
-    void verificarCadastroDuplicado() {
+    void verificarCadastroDuplicado() throws SQLException {
         Servico servico1 = new Servico(
                 "Forro de Sala",
                 1500,
@@ -205,7 +206,7 @@ public class GerenciadorServicosTest {
     }
 
     @Test
-    void buscarIdExistente() {
+    void buscarIdExistente() throws SQLException {
         Servico servico1 = new Servico(
                 "Forro de Sala",
                 2000,
@@ -220,7 +221,7 @@ public class GerenciadorServicosTest {
     }
 
     @Test
-    void buscarIdInvalido() {
+    void buscarIdInvalido() throws SQLException {
         Servico servico1 = new Servico(
                 "Forro de Sala",
                 2000,
@@ -235,7 +236,7 @@ public class GerenciadorServicosTest {
     }
 
     @Test
-    void buscarIdInexistente() {
+    void buscarIdInexistente() throws SQLException {
         Servico servico1 = new Servico(
                 "Forro de Sala",
                 2000,
@@ -250,7 +251,7 @@ public class GerenciadorServicosTest {
     }
 
     @Test
-    void deveIniciarServicoEncontradoPorId() {
+    void deveIniciarServicoEncontradoPorId() throws SQLException {
         Servico servico1 = new Servico(
                 "Forro de Sala",
                 2000,
@@ -278,7 +279,7 @@ public class GerenciadorServicosTest {
     }
 
     @Test
-    void deveIniciarServicoPorId() {
+    void deveIniciarServicoPorId() throws SQLException {
         Servico servico1 = new Servico(
                 "Forro de Sala",
                 2000,
@@ -305,7 +306,7 @@ public class GerenciadorServicosTest {
     }
 
     @Test
-    void deveConcluirServicoPorId() {
+    void deveConcluirServicoPorId() throws SQLException {
         Servico servico1 = new Servico(
                 "Forro de Sala",
                 2000,
@@ -333,7 +334,7 @@ public class GerenciadorServicosTest {
     }
 
     @Test
-    void deveCancelarServicoPorId() {
+    void deveCancelarServicoPorId() throws SQLException {
         Servico servico1 = new Servico(
                 "Forro de Sala",
                 2000,
@@ -361,7 +362,7 @@ public class GerenciadorServicosTest {
     }
 
     @Test
-    void naoCancelarServicoConcluidoPorId() {
+    void naoCancelarServicoConcluidoPorId() throws SQLException {
         Servico servico1 = new Servico(
                 "Forro de Sala",
                 2000,
@@ -388,7 +389,7 @@ public class GerenciadorServicosTest {
         );
     }
     @Test
-    void verificarBuscarPorStatusComElementos() {
+    void verificarBuscarPorStatusComElementos() throws SQLException {
         Servico servico1 = new Servico(
                 "Forro de Sala",
                 2000,
@@ -427,7 +428,7 @@ public class GerenciadorServicosTest {
         );
     }
     @Test
-    void verificarBuscarPorStatusSemElementos() {
+    void verificarBuscarPorStatusSemElementos() throws SQLException {
         Servico servico1 = new Servico(
                 "Forro de Sala",
                 2000,
@@ -456,7 +457,7 @@ public class GerenciadorServicosTest {
         );
     }
     @Test
-    void verificarBuscarPorStatusNull() {
+    void verificarBuscarPorStatusNull() throws SQLException {
         Servico servico1 = new Servico(
                 "Forro de Sala",
                 2000,
@@ -470,7 +471,7 @@ public class GerenciadorServicosTest {
         );
     }
     @Test
-    void deveArquivarServicoPorId() {
+    void deveArquivarServicoPorId() throws SQLException {
         Servico servico1 = new Servico(
                 "Forro de Sala",
                 2000,
@@ -499,7 +500,7 @@ public class GerenciadorServicosTest {
         );
     }
     @Test
-    void naoDeveArquivarServicoEmAndamentoPorId() {
+    void naoDeveArquivarServicoEmAndamentoPorId() throws SQLException {
         Servico servico1 = new Servico(
                 "Forro de Sala",
                 2000,
@@ -538,7 +539,7 @@ public class GerenciadorServicosTest {
         );
     }
     @Test
-    void deveBuscarServicosNaoArquivados() {
+    void deveBuscarServicosNaoArquivados() throws SQLException {
         Servico servico1 = new Servico(
                 "Forro de Sala",
                 2000,
@@ -571,7 +572,7 @@ public class GerenciadorServicosTest {
         );
     }
     @Test
-    void deveRetornarListaVaziaQuandoTodosArquivados() {
+    void deveRetornarListaVaziaQuandoTodosArquivados() throws SQLException {
         Servico servico1 = new Servico(
                 "Forro de Sala",
                 2000,

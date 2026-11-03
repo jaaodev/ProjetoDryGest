@@ -1,15 +1,28 @@
-import br.com.drygest.Categoria;
-import br.com.drygest.GerenciadorServicos;
-import br.com.drygest.Servico;
-import br.com.drygest.Status;
+import br.com.drygest.*;
 
+import java.sql.SQLException;
 import java.text.NumberFormat;
 import java.util.*;
 
 public class Main {
     public static void main(String[] args) {
+        ServicoRepository repository = new ServicoRepository();
+        GerenciadorServicos gs = new GerenciadorServicos(repository);
+
+        try {
+            gs.carregarServicos();
+            iniciarMenu(gs);
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+            System.out.println("Falha ao conectar ao banco de dados.");
+        }
+    }
+
+    private static void iniciarMenu(
+            GerenciadorServicos gs
+    ) {
         Scanner sc = new Scanner(System.in);
-        GerenciadorServicos gs = new GerenciadorServicos();
+
         int opcao;
 
         do {
@@ -22,6 +35,7 @@ public class Main {
             System.out.println("5 - Cancelar serviço");
             System.out.println("6 - Arquivar serviço");
             System.out.println("7 - Histórico de serviços");
+            System.out.println("8 - Atualizar serviços");
             System.out.println("0 - Sair");
             System.out.println("Escolha uma opção: ");
             opcao = lerInteiro(sc);
@@ -46,6 +60,15 @@ public class Main {
                     break;
                 case 7:
                     historicoServicosArquivados(gs);
+                    break;
+                case 8:
+                    try {
+                        gs.carregarServicos();
+                        System.out.println("Serviços atualizados com sucesso!");
+                    } catch (SQLException e) {
+                        System.out.println(e.getMessage());
+                        System.out.println("Não foi possível atualizar os serviços. Tente novamente.");
+                    }
                     break;
                 case 0:
                     System.out.println("Saindo...");
@@ -106,7 +129,7 @@ public class Main {
             System.out.println("Valor: " + formatarMoeda(servico.getValor()));
             System.out.println("Área: " + servico.calcularArea()
                     + "m²");
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException | SQLException e) {
             System.out.println(e.getMessage());
         }
 
@@ -120,11 +143,16 @@ public class Main {
             System.out.println("Digite o ID do serviço que será iniciado: ");
             int id = lerInteiro(sc);
             gs.iniciarServicoPorId(id);
-            System.out.println("Serviço #"+ id +" iniciado com sucesso!");
+            System.out.println("Serviço #" + id + " iniciado com sucesso!");
         } catch (NoSuchElementException e) {
             System.out.println("Serviço não encontrado.");
         } catch (IllegalStateException e) {
             System.out.println("Não é possível iniciar esse serviço.");
+        } catch (SQLException e) {
+            System.out.println("Não foi possível salvar a alteração. Tente novamente.");
+        } catch (ConflitoAtualizacaoException e) {
+            System.out.println("Os dados deste serviço estão desatualizados.");
+            System.out.println("Atualize os serviços e tente novamente.");
         }
     }
 
@@ -136,11 +164,16 @@ public class Main {
             System.out.println("Digite o ID do serviço que será concluído: ");
             int id = lerInteiro(sc);
             gs.concluirServicoPorId(id);
-            System.out.println("Serviço #"+ id +" concluido com sucesso!");
+            System.out.println("Serviço #" + id + " concluido com sucesso!");
         } catch (NoSuchElementException e) {
             System.out.println("Serviço não encontrado.");
         } catch (IllegalStateException e) {
             System.out.println("Não é possível concluir esse serviço.");
+        } catch (SQLException e) {
+            System.out.println("Não foi possível salvar a alteração. Tente novamente.");
+        } catch (ConflitoAtualizacaoException e) {
+            System.out.println("Os dados deste serviço estão desatualizados.");
+            System.out.println("Atualize os serviços e tente novamente.");
         }
     }
 
@@ -152,11 +185,16 @@ public class Main {
             System.out.println("Digite o ID do serviço que será cancelado: ");
             int id = lerInteiro(sc);
             gs.cancelarServicoPorId(id);
-            System.out.println("Serviço #"+ id +" cancelado com sucesso!");
+            System.out.println("Serviço #" + id + " cancelado com sucesso!");
         } catch (NoSuchElementException e) {
             System.out.println("Serviço não encontrado.");
         } catch (IllegalStateException e) {
             System.out.println("Não é possível cancelar esse serviço.");
+        } catch (SQLException e) {
+            System.out.println("Não foi possível salvar a alteração. Tente novamente.");
+        } catch (ConflitoAtualizacaoException e) {
+            System.out.println("Os dados deste serviço estão desatualizados.");
+            System.out.println("Atualize os serviços e tente novamente.");
         }
     }
 
@@ -168,11 +206,16 @@ public class Main {
             System.out.println("Digite o ID do serviço que será arquivado: ");
             int id = lerInteiro(sc);
             gs.arquivarServicoPorId(id);
-            System.out.println("Serviço #"+ id +" arquivado com sucesso!");
+            System.out.println("Serviço #" + id + " arquivado com sucesso!");
         } catch (NoSuchElementException e) {
             System.out.println("Serviço não encontrado.");
         } catch (IllegalStateException e) {
             System.out.println("Não é possível arquivar esse serviço.");
+        } catch (SQLException e) {
+            System.out.println("Não foi possível salvar a alteração. Tente novamente.");
+        } catch (ConflitoAtualizacaoException e) {
+            System.out.println("Os dados deste serviço estão desatualizados.");
+            System.out.println("Atualize os serviços e tente novamente.");
         }
     }
 
@@ -225,7 +268,8 @@ public class Main {
         if (servicos.isEmpty()) {
             System.out.println("Nenhum serviço encontrado.");
             return;
-        } System.out.println("======== LISTA DE SERVIÇOS ========");
+        }
+        System.out.println("======== LISTA DE SERVIÇOS ========");
         servicos.forEach(Main::exibirServico);
     }
 
@@ -234,7 +278,10 @@ public class Main {
         if (servicos.isEmpty()) {
             System.out.println("Nenhum serviço arquivado encontrado.");
             return;
-        } System.out.println("======== HISTÓRICO DE SERVIÇOS ARQUIVADOS ========");
+        }
+        System.out.println("======== HISTÓRICO DE SERVIÇOS ARQUIVADOS ========");
         servicos.forEach(Main::exibirServico);
     }
+
+
 }
