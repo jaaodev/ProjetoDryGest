@@ -73,20 +73,13 @@ O fluxo principal da aplicação é: **`Main` → `GerenciadorServicos` → `Ser
 
 2. Crie um banco PostgreSQL chamado `drygest`.
 
-3. **Prepare a tabela `servicos`.** O repositório, na versão analisada, ainda não inclui um arquivo de migração SQL. O exemplo abaixo é um **esquema sugerido**, compatível com os campos lidos e gravados pelo código atual; não representa uma migração já presente no projeto:
+3. **Crie a tabela `servicos`** executando o script [`database/schema.sql`](database/schema.sql) no banco `drygest`. Por exemplo, com o cliente `psql` instalado:
 
-   ```sql
-   CREATE TABLE servicos (
-       id SERIAL PRIMARY KEY,
-       nome VARCHAR(255) NOT NULL,
-       valor DOUBLE PRECISION NOT NULL,
-       categoria VARCHAR(30) NOT NULL,
-       status VARCHAR(30) NOT NULL DEFAULT 'PENDENTE',
-       largura DOUBLE PRECISION NOT NULL,
-       comprimento DOUBLE PRECISION NOT NULL,
-       arquivado BOOLEAN NOT NULL DEFAULT FALSE
-   );
+   ```bash
+   psql -U SEU_USUARIO -d drygest -f database/schema.sql
    ```
+
+   O script cria a tabela com os campos necessários, restrições de valores e status. Se a tabela já existir, `IF NOT EXISTS` não atualiza sua estrutura; revise eventuais diferenças antes de executar o sistema.
 
 4. Configure as variáveis de ambiente usadas pela classe `ConexaoPostgreSQL`:
 
@@ -97,7 +90,7 @@ O fluxo principal da aplicação é: **`Main` → `GerenciadorServicos` → `Ser
 
 5. Importe o projeto Maven no IntelliJ IDEA e execute a classe `Main.java`.
 
-> **Observação:** por enquanto, a aplicação depende de um PostgreSQL local e da criação manual da tabela. A execução de ponta a ponta não foi verificada durante a elaboração desta documentação.
+> **Observação:** por enquanto, a aplicação depende de um PostgreSQL local; o script de inicialização deve ser executado manualmente. A execução de ponta a ponta não foi verificada durante a elaboração desta documentação.
 
 ## Testes
 
@@ -115,7 +108,7 @@ Este projeto foi utilizado para praticar **orientação a objetos, encapsulament
 
 Melhorias planejadas ou possíveis:
 
-- Disponibilizar um script SQL versionado para inicializar o banco.
+- Validar o script SQL de inicialização em um ambiente PostgreSQL limpo.
 - Externalizar a URL de conexão e revisar o processo de configuração.
 - Evoluir a aplicação para uma API REST utilizando Spring Boot.
 - Criar uma interface para facilitar o uso por profissionais da área.
